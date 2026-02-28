@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<linker>
+	<assembly fullname="rdbcli">
+		<type fullname="RDBCLI.Core.DatabaseConfig" preserve="all" />
+		<type fullname="RDBCLI.Core.Enums.DatabaseType" preserve="all" />
+	</assembly>
+</linker>
