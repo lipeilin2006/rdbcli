@@ -3,7 +3,7 @@ using RDBCLI.Core.Enums;
 
 namespace RDBCLI.Core
 {
-    public class SqlExecuteResult
+    internal class SqlExecuteResult
     {
         public bool IsSuccess { get; set; }
         public string ErrorMessage { get; set; } = string.Empty;

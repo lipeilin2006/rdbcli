@@ -1,0 +1,46 @@
+﻿#!/usr/bin/fish
+complete -c rdbcli -n 'not __fish_seen_subcommand_from' -a 'database' -d '管理数据库配置'
+complete -c rdbcli -n 'not __fish_seen_subcommand_from' -a 'execute' -d '执行SQL语句'
+complete -c rdbcli -n 'not __fish_seen_subcommand_from' -a '--help' -d '显示帮助'
+complete -c rdbcli -n 'not __fish_seen_subcommand_from' -a '--version' -d '显示版本'
+
+complete -c rdbcli -n '__fish_seen_subcommand_from database' -a 'add' -d '添加配置'
+complete -c rdbcli -n '__fish_seen_subcommand_from database' -a 'delete' -d '删除配置'
+complete -c rdbcli -n '__fish_seen_subcommand_from database' -a 'list' -d '列出配置'
+complete -c rdbcli -n '__fish_seen_subcommand_from database' -a '--help' -d '显示帮助'
+
+complete -c rdbcli -n '__fish_seen_subcommand_from database add' -a '-n' -d '名称'
+complete -c rdbcli -n '__fish_seen_subcommand_from database add' -a '--name' -d '名称'
+complete -c rdbcli -n '__fish_seen_subcommand_from database add' -a '-c' -d '连接字符串'
+complete -c rdbcli -n '__fish_seen_subcommand_from database add' -a '--connection-string' -d '连接字符串'
+complete -c rdbcli -n '__fish_seen_subcommand_from database add' -a '-t' -d '类型'
+complete -c rdbcli -n '__fish_seen_subcommand_from database add' -a '--type' -d '类型'
+complete -c rdbcli -n '__fish_seen_subcommand_from database add' -a '-h' -d '帮助'
+complete -c rdbcli -n '__fish_seen_subcommand_from database add' -a '--help' -d '帮助'
+
+complete -c rdbcli -n '__fish_seen_subcommand_from database add -t' -a 'Firebird MySql ODBC Oracle PostgreSQL Sqlite SqlServer' -d '数据库类型'
+complete -c rdbcli -n '__fish_seen_subcommand_from database add --type' -a 'Firebird MySql ODBC Oracle PostgreSQL Sqlite SqlServer' -d '数据库类型'
+
+complete -c rdbcli -n '__fish_seen_subcommand_from database delete' -a '-n' -d '名称'
+complete -c rdbcli -n '__fish_seen_subcommand_from database delete' -a '--name' -d '名称'
+complete -c rdbcli -n '__fish_seen_subcommand_from database delete' -a '-h' -d '帮助'
+complete -c rdbcli -n '__fish_seen_subcommand_from database delete' -a '--help' -d '帮助'
+
+complete -c rdbcli -n '__fish_seen_subcommand_from database list' -a '-h' -d '帮助'
+complete -c rdbcli -n '__fish_seen_subcommand_from database list' -a '--help' -d '帮助'
+
+complete -c rdbcli -n '__fish_seen_subcommand_from execute' -a '-d' -d '数据库'
+complete -c rdbcli -n '__fish_seen_subcommand_from execute' -a '--database' -d '数据库'
+complete -c rdbcli -n '__fish_seen_subcommand_from execute' -a '-s' -d 'SQL语句'
+complete -c rdbcli -n '__fish_seen_subcommand_from execute' -a '--sql' -d 'SQL语句'
+complete -c rdbcli -n '__fish_seen_subcommand_from execute' -a '-f' -d 'SQL文件'
+complete -c rdbcli -n '__fish_seen_subcommand_from execute' -a '--file' -d 'SQL文件'
+complete -c rdbcli -n '__fish_seen_subcommand_from execute' -a '-o' -d '输出文件'
+complete -c rdbcli -n '__fish_seen_subcommand_from execute' -a '--output' -d '输出文件'
+complete -c rdbcli -n '__fish_seen_subcommand_from execute' -a '-h' -d '帮助'
+complete -c rdbcli -n '__fish_seen_subcommand_from execute' -a '--help' -d '帮助'
+
+complete -c rdbcli -n '__fish_seen_subcommand_from execute -f' -f -d '文件路径'
+complete -c rdbcli -n '__fish_seen_subcommand_from execute --file' -f -d '文件路径'
+complete -c rdbcli -n '__fish_seen_subcommand_from execute -o' -f -d '文件路径'
+complete -c rdbcli -n '__fish_seen_subcommand_from execute --output' -f -d '文件路径'

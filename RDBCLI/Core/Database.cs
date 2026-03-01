@@ -11,7 +11,7 @@ using RDBCLI.Core.Enums;
 
 namespace RDBCLI.Core
 {
-    public class Database
+    internal class Database
     {
         public DatabaseConfig DatabaseConfig { get; set; }
 

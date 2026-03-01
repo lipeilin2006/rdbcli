@@ -1,6 +1,6 @@
 ﻿namespace RDBCLI.Core.Enums
 {
-    public enum DatabaseType
+    internal enum DatabaseType
     {
         SqlServer,
         MySql,

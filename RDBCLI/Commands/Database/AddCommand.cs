@@ -5,29 +5,30 @@ using System.CommandLine;
 
 namespace RDBCLI.Commands.Database
 {
-    internal class AddCommand : ICommandProvider
+    internal class AddCommand : Command
     {
-        public Command ProvideCommand()
+        private Option<string> nameOption = new Option<string>("-n", "--name")
         {
-            Command command = new Command("add", Descriptions.AddDatabaseCommandDescription);
+            Description = Descriptions.AddDatabaseCommandNameOptionDescription,
+            Required = true,
+        };
+        private Option<string> connectionStringOption = new Option<string>("-c", "--connection-string")
+        {
+            Description = Descriptions.AddDatabaseCommandConnectionStringOptionDescription,
+            Required = true,
+        };
+        private Option<DatabaseType> typeOption = new Option<DatabaseType>("-t", "--type")
+        {
+            Description = Descriptions.AddDatabaseCommandTypeOptionDescription,
+            Required = true,
+        };
+        public AddCommand() : base("add", Descriptions.AddDatabaseCommandDescription)
+        {
+            Options.Add(nameOption);
+            Options.Add(connectionStringOption);
+            Options.Add(typeOption);
 
-            Option<string> nameOption = new Option<string>("-n", "--name")
-            {
-                Description = Descriptions.AddDatabaseCommandNameOptionDescription
-            };
-            Option<string> connectionStringOption = new Option<string>("-c", "--connection-string")
-            {
-                Description = Descriptions.AddDatabaseCommandConnectionStringOptionDescription
-            };
-            Option<DatabaseType> typeOption = new Option<DatabaseType>("-t", "--type")
-            {
-                Description = Descriptions.AddDatabaseCommandTypeOptionDescription
-            };
-            command.Options.Add(nameOption);
-            command.Options.Add(connectionStringOption);
-            command.Options.Add(typeOption);
-
-            command.SetAction(parseResult =>
+            SetAction(parseResult =>
             {
                 string name = parseResult.GetRequiredValue(nameOption);
                 string connectionString = parseResult.GetRequiredValue(connectionStringOption);
@@ -42,8 +43,6 @@ namespace RDBCLI.Commands.Database
                 ConfigManager.SaveConfig();
                 Console.WriteLine(Messages.DatabaseAdded);
             });
-
-            return command;
         }
     }
 }

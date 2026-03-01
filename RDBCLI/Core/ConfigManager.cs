@@ -3,7 +3,7 @@ using YamlDotNet.Serialization.NamingConventions;
 
 namespace RDBCLI.Core
 {
-    public class ConfigManager
+    internal class ConfigManager
     {
         public static List<DatabaseConfig> DatabaseConfigs { get; private set; }
 

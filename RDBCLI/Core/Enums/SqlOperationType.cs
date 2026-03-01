@@ -1,6 +1,6 @@
 ﻿namespace RDBCLI.Core.Enums
 {
-    public enum SqlOperationType
+    internal enum SqlOperationType
     {
         Query,
         NonQuery

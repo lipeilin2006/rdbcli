@@ -1,19 +1,16 @@
 ﻿using RDBCLI.Resources;
 using RDBCLI.Commands.Database;
 using System.CommandLine;
-using RDBCLI.Core;
 
 namespace RDBCLI.Commands
 {
-    internal class DatabaseCommand : ICommandProvider
+    internal class DatabaseCommand : Command
     {
-        public Command ProvideCommand()
+        public DatabaseCommand() : base("database", Descriptions.DatabaseCommandDescription)
         {
-            Command command = new("database", Descriptions.DatabaseCommandDescription);
-            command.Subcommands.Add(new AddCommand().ProvideCommand());
-            command.Subcommands.Add(new DeleteCommand().ProvideCommand());
-            command.Subcommands.Add(new ListCommand().ProvideCommand());
-            return command;
+            Subcommands.Add(new AddCommand());
+            Subcommands.Add(new DeleteCommand());
+            Subcommands.Add(new ListCommand());
         }
     }
 }

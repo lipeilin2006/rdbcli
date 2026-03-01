@@ -5,17 +5,15 @@ using System.CommandLine;
 
 namespace RDBCLI.Commands.Database
 {
-    internal class ListCommand : ICommandProvider
+    internal class ListCommand : Command
     {
-        public Command ProvideCommand()
+        public ListCommand() : base("list", Descriptions.ListDatabaseCommandDescription)
         {
-            Command command=new("list", Descriptions.ListDatabaseCommandDescription);
-
-            command.SetAction(parseResult =>
+            SetAction(parseResult =>
             {
                 var table = new ConsoleTable(
-                    Descriptions.ListDatabaseTableNameTitle, 
-                    Descriptions.ListDatabaseTableTypeTitle, 
+                    Descriptions.ListDatabaseTableNameTitle,
+                    Descriptions.ListDatabaseTableTypeTitle,
                     Descriptions.ListDatabaseTableConnectionStringTitle);
 
                 foreach (var config in ConfigManager.DatabaseConfigs)
@@ -25,8 +23,6 @@ namespace RDBCLI.Commands.Database
                 table.Write();
                 Console.WriteLine();
             });
-
-            return command;
         }
     }
 }

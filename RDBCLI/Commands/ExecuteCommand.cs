@@ -7,35 +7,33 @@ using System.Data;
 
 namespace RDBCLI.Commands
 {
-    internal class ExecuteCommand : ICommandProvider
+    internal class ExecuteCommand : Command
     {
-        public Command ProvideCommand()
+        private Option<string> databaseOption = new Option<string>("-d", "--database")
         {
-            Command command = new Command("execute", Descriptions.ExecuteCommandDescription);
+            Description = Descriptions.ExecuteCommnadDatabaseOptionDescription,
+            Required = true,
+        };
+        private Option<string> sqlOption = new Option<string>("-s", "--sql")
+        {
+            Description = Descriptions.ExecuteCommandSQLOptionDescription
+        };
+        private Option<string> fileOption = new Option<string>("-f", "--file")
+        {
+            Description = Descriptions.ExecuteCommandFileOptionDescription
+        };
+        private Option<string> outputOption = new Option<string>("-o", "--output")
+        {
+            Description = Descriptions.ExecuteCommandOutputOptionDescription
+        };
+        public ExecuteCommand() : base("execute", Descriptions.ExecuteCommandDescription)
+        {
+            Options.Add(databaseOption);
+            Options.Add(sqlOption);
+            Options.Add(fileOption);
+            Options.Add(outputOption);
 
-            Option<string> databaseOption = new Option<string>("-d", "--database")
-            {
-                Description = Descriptions.ExecuteCommnadDatabaseOptionDescription
-            };
-            Option<string> sqlOption = new Option<string>("-s", "--sql")
-            {
-                Description = Descriptions.ExecuteCommandSQLOptionDescription
-            };
-            Option<string> fileOption = new Option<string>("-f", "--file")
-            {
-                Description = Descriptions.ExecuteCommandFileOptionDescription
-            };
-            Option<string> outputOption=new Option<string>("-o","--output")
-            {
-                Description = Descriptions.ExecuteCommandOutputOptionDescription
-            };
-
-            command.Options.Add(databaseOption);
-            command.Options.Add(sqlOption);
-            command.Options.Add(fileOption);
-            command.Options.Add(outputOption);
-
-            command.SetAction(parseResult =>
+            SetAction(parseResult =>
             {
                 string name = parseResult.GetRequiredValue(databaseOption);
                 string? filePath = parseResult.GetValue(fileOption);
@@ -74,10 +72,7 @@ namespace RDBCLI.Commands
                     Console.WriteLine(string.Format(Messages.AffectedRows, result.AffectedRows));
                 }
             });
-
-            return command;
         }
-
         private void OutputToConsole(DataSet dataSet)
         {
             foreach (DataTable table in dataSet.Tables)
