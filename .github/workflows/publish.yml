@@ -41,7 +41,7 @@ name: publish
 on:
   push:
     tags:
-      - "v*"
+      - "*"
 
 jobs:
 
