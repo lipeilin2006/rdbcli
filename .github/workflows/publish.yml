@@ -38,6 +38,9 @@
 
 name: publish
 
+permissions:
+  contents: write
+
 on:
   push:
     tags:
