@@ -113,17 +113,18 @@ jobs:
         shell: bash
 
       # 5. 复制 completions 目录到发布目录（核心步骤）
-      - name: Copy completions to publish directory
+      - name: Copy completions and license to publish directory
         run: |
           if [ -d "./completions" ]; then
             cp -r ./completions ./publish/${{ matrix.runtime }}/
+            cp ./LICENSE ./publish/${{ matrix.runtime }}/
             echo "✅ Completions directory copied successfully"
           else
             echo "⚠️ Completions directory not found in source code"
           fi
         shell: bash
         
-      # Linux 运行时 - tar.gz 格式
+      # 6. 打包为 tar.gz
       - name: Package
         run: |
           tar -czvf ${{ matrix.package-name }} -C ./publish/${{ matrix.runtime }} .
