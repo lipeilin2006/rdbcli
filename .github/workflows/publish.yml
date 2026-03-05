@@ -94,6 +94,8 @@ jobs:
             --output ./publish/${{ matrix.runtime }} \
             --self-contained true \
             -r ${{ matrix.runtime }} \
+            /p:PublishSingleFile=true \
+            /p:IncludeNativeLibrariesForSelfExtract=true
             /p:Version=${{ github.ref_name }}
         shell: bash
 
