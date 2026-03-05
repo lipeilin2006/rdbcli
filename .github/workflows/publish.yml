@@ -115,7 +115,6 @@ jobs:
       # 5. 复制 completions 目录到发布目录（核心步骤）
       - name: Copy completions and license to publish directory
         run: |
-          cp ./LICENSE ./publish/${{ matrix.runtime }}/
           if [ -d "./completions" ]; then
             cp -r ./completions ./publish/${{ matrix.runtime }}/
             echo "✅ Completions directory copied successfully"
