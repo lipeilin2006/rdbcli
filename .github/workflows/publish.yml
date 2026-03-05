@@ -85,12 +85,12 @@ jobs:
       # 4. 构建并打包项目（Release 模式）
       - name: Build and publish
         run: |
-          dotnet publish ./RDBCLI/RDBCLI.csproj `
-            --configuration Release `
-            --no-restore `
-            --output ./publish/${{ matrix.runtime }} `
-            --self-contained true `
-            -r ${{ matrix.runtime }} `
+          dotnet publish ./RDBCLI/RDBCLI.csproj \
+            --configuration Release \
+            --no-restore \
+            --output ./publish/${{ matrix.runtime }} \
+            --self-contained true \
+            -r ${{ matrix.runtime }} \
             /p:Version=${{ github.ref_name }}
         shell: bash
 
