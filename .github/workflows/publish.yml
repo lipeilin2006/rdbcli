@@ -61,12 +61,25 @@ jobs:
           # Windows x64
           - runtime: win-x64
             package-name: rdbcli-${{ github.ref_name }}-win-x64.tar.gz
+          # Windows ARM64
+          - runtime: win-arm64
+            package-name: rdbcli-${{ github.ref_name }}-win-arm64.tar.gz
           # Linux x64
           - runtime: linux-x64
             package-name: rdbcli-${{ github.ref_name }}-linux-x64.tar.gz
+          # Linux ARM
+          - runtime: linux-arm
+            package-name: rdbcli-${{ github.ref_name }}-linux-arm.tar.gz
           # Linux ARM64
           - runtime: linux-arm64
             package-name: rdbcli-${{ github.ref_name }}-linux-arm64.tar.gz
+          # Mac OSX x64
+          - runtime: osx-x64
+            package-name: rdbcli-${{ github.ref_name }}-osx-x64.tar.gz
+          # Mac OSX ARM64
+          - runtime: osx-arm64
+            package-name: rdbcli-${{ github.ref_name }}-osx-arm64.tar.gz
+
     steps:
       # 1. 拉取仓库代码
       - name: Checkout code
