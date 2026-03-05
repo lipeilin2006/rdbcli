@@ -1,0 +1,122 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+# This workflow will build, test, sign and package a WPF or Windows Forms desktop application
+# built on .NET Core.
+# To learn how to migrate your existing application to .NET Core,
+# refer to https://docs.microsoft.com/en-us/dotnet/desktop-wpf/migration/convert-project-from-net-framework
+#
+# To configure this workflow:
+#
+# 1. Configure environment variables
+# GitHub sets default environment variables for every workflow run.
+# Replace the variables relative to your project in the "env" section below.
+#
+# 2. Signing
+# Generate a signing certificate in the Windows Application
+# Packaging Project or add an existing signing certificate to the project.
+# Next, use PowerShell to encode the .pfx file using Base64 encoding
+# by running the following Powershell script to generate the output string:
+#
+# $pfx_cert = Get-Content '.\SigningCertificate.pfx' -Encoding Byte
+# [System.Convert]::ToBase64String($pfx_cert) | Out-File 'SigningCertificate_Encoded.txt'
+#
+# Open the output file, SigningCertificate_Encoded.txt, and copy the
+# string inside. Then, add the string to the repo as a GitHub secret
+# and name it "Base64_Encoded_Pfx."
+# For more information on how to configure your signing certificate for
+# this workflow, refer to https://github.com/microsoft/github-actions-for-desktop-apps#signing
+#
+# Finally, add the signing certificate password to the repo as a secret and name it "Pfx_Key".
+# See "Build the Windows Application Packaging project" below to see how the secret is used.
+#
+# For more information on GitHub Actions, refer to https://github.com/features/actions
+# For a complete CI/CD sample to get started with GitHub Action workflows for Desktop Applications,
+# refer to https://github.com/microsoft/github-actions-for-desktop-apps
+
+name: publish
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+
+  build-and-release:
+
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false  # 一个运行时构建失败，不影响其他运行时
+      matrix:
+        include:
+          # Windows x86
+          - runtime: win-x86
+            package-name: rdbcli-${{ github.ref_name }}-win-x86.tar.gz
+          # Windows x64
+          - runtime: win-x64
+            package-name: rdbcli-${{ github.ref_name }}-win-x64.tar.gz
+          # Linux x64
+          - runtime: linux-x64
+            package-name: rdbcli-${{ github.ref_name }}-linux-x64.tar.gz
+          # Linux ARM64
+          - runtime: linux-arm64
+            package-name: rdbcli-${{ github.ref_name }}-linux-arm64.tar.gz
+    steps:
+      # 1. 拉取仓库代码
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 拉取完整提交历史，用于版本号计算（可选）
+
+      # 2. 设置 .NET SDK 环境
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          # 指定你项目使用的 .NET 版本（如 6.0、7.0、8.0）
+          dotnet-version: '10.0.x'
+
+      # 3. 恢复项目依赖
+      - name: Restore dependencies
+        run: dotnet restore
+
+      # 4. 构建并打包项目（Release 模式）
+      - name: Build and publish
+        run: |
+          dotnet publish ./RDBCLI/rdbcli.csproj `
+            --configuration Release `
+            --no-restore `
+            --output ./publish/${{ matrix.runtime }} `
+            --self-contained true `
+            -r ${{ matrix.runtime }} `
+            /p:Version=${{ github.ref_name }}
+        shell: bash
+
+      # 5. 复制 completions 目录到发布目录（核心步骤）
+      - name: Copy completions to publish directory
+        run: |
+          if [ -d "./completions" ]; then
+            cp -r ./completions ./publish/${{ matrix.runtime }}/
+            echo "✅ Completions directory copied successfully"
+          else
+            echo "⚠️ Completions directory not found in source code"
+          fi
+        shell: bash
+        
+      # Linux 运行时 - tar.gz 格式
+      - name: Package
+        run: |
+          tar -czvf ${{ matrix.package-name }} -C ./publish/${{ matrix.runtime }} .
+        shell: bash
+
+      # 6. 创建 GitHub Release 并上传文件
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          # 上传的文件路径
+          files: ${{ matrix.package-name }}
+        env:
+          # 必须的环境变量：GitHub Token（自动注入）
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
