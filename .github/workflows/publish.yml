@@ -130,13 +130,22 @@ jobs:
         run: |
           tar -czvf ${{ matrix.package-name }} -C ./publish/${{ matrix.runtime }} .
         shell: bash
+      
+      # 7. 计算Sha256sum
+      - name: Calculate sha256 checksum
+        run: |
+          sha256sum ${{ matrix.package-name }} > ${{ matrix.package-name }}.sha256
+          echo "✅ SHA256 checksum for ${{ matrix.package-name }}"
+        shell: bash
 
-      # 6. 创建 GitHub Release 并上传文件
+      # 8. 创建 GitHub Release 并上传文件
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           # 上传的文件路径
-          files: ${{ matrix.package-name }}
+          files: |
+            ${{ matrix.package-name }}
+            ${{ matrix.package-name }}.sha256
         env:
           # 必须的环境变量：GitHub Token（自动注入）
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
