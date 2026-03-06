@@ -49,8 +49,7 @@ on:
 
 jobs:
 
-  build-and-release:
-
+  build:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false  # 一个运行时构建失败，不影响其他运行时
@@ -58,28 +57,36 @@ jobs:
         include:
           # Windows x86
           - runtime: win-x86
-            package-name: rdbcli-${{ github.ref_name }}-win-x86.tar.gz
+            package-name: rdbcli-${{ github.ref_name }}-win-x86.zip
+            package-type: zip
           # Windows x64
           - runtime: win-x64
-            package-name: rdbcli-${{ github.ref_name }}-win-x64.tar.gz
+            package-name: rdbcli-${{ github.ref_name }}-win-x64.zip
+            package-type: zip
           # Windows ARM64
           - runtime: win-arm64
-            package-name: rdbcli-${{ github.ref_name }}-win-arm64.tar.gz
+            package-name: rdbcli-${{ github.ref_name }}-win-arm64.zip
+            package-type: zip
           # Linux x64
           - runtime: linux-x64
             package-name: rdbcli-${{ github.ref_name }}-linux-x64.tar.gz
+            package-type: tar.gz
           # Linux ARM
           - runtime: linux-arm
             package-name: rdbcli-${{ github.ref_name }}-linux-arm.tar.gz
+            package-type: tar.gz
           # Linux ARM64
           - runtime: linux-arm64
             package-name: rdbcli-${{ github.ref_name }}-linux-arm64.tar.gz
+            package-type: tar.gz
           # Mac OSX x64
           - runtime: osx-x64
             package-name: rdbcli-${{ github.ref_name }}-osx-x64.tar.gz
+            package-type: tar.gz
           # Mac OSX ARM64
           - runtime: osx-arm64
             package-name: rdbcli-${{ github.ref_name }}-osx-arm64.tar.gz
+            package-type: tar.gz
 
     steps:
       # 1. 拉取仓库代码
@@ -95,12 +102,10 @@ jobs:
           # 指定你项目使用的 .NET 版本（如 6.0、7.0、8.0）
           dotnet-version: '10.0.x'
 
-      # 3. 恢复项目依赖
       - name: Restore dependencies
         run: dotnet restore
 
-      # 4. 构建并打包项目（Release 模式）
-      - name: Build and publish
+      - name: Dotnet publish
         run: |
           dotnet publish ./RDBCLI/RDBCLI.csproj \
             --configuration Release \
@@ -113,7 +118,6 @@ jobs:
             /p:Version=${{ github.ref_name }}
         shell: bash
 
-      # 5. 复制 completions 目录到发布目录（核心步骤）
       - name: Copy completions and license to publish directory
         run: |
           cp ./LICENSE ./publish/${{ matrix.runtime }}/
@@ -125,27 +129,62 @@ jobs:
           fi
         shell: bash
         
-      # 6. 打包为 tar.gz
-      - name: Package
+      - name: Package as zip
+        if: matrix.package-type == 'zip'
+        run: |
+          cd ./publish/${{ matrix.runtime }}
+          zip -r ../../${{ matrix.package-name }} ./*
+        shell: bash
+
+      - name: Package as tar.gz
+        if: matrix.package-type == 'tar.gz'
         run: |
           tar -czvf ${{ matrix.package-name }} -C ./publish/${{ matrix.runtime }} .
         shell: bash
-      
-      # 7. 计算Sha256sum
+
       - name: Calculate sha256 checksum
         run: |
           sha256sum ${{ matrix.package-name }} > ${{ matrix.package-name }}.sha256
           echo "✅ SHA256 checksum for ${{ matrix.package-name }}"
         shell: bash
 
-      # 8. 创建 GitHub Release 并上传文件
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.package-name }}-artifact
+          path: |
+            ${{ matrix.package-name }}
+            ${{ matrix.package-name }}.sha256
+          retention-days: 0
+
+  release:
+    runs-on: ubuntu-latest
+    needs: build
+    if: success()
+    steps:
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+          merge-multiple: true
+
+      - name: Create GitHub Release and upload all assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ./artifacts/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Clean up temporary artifacts
+        uses: geekyeggo/delete-artifact@v5
+        with:
+          name: "*"
+          confirm: true
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          # 上传的文件路径
           files: |
             ${{ matrix.package-name }}
             ${{ matrix.package-name }}.sha256
         env:
-          # 必须的环境变量：GitHub Token（自动注入）
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
