@@ -180,11 +180,3 @@ jobs:
         with:
           name: "*"
           confirm: true
-      - name: Create Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            ${{ matrix.package-name }}
-            ${{ matrix.package-name }}.sha256
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
